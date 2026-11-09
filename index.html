@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>База акумуляторів Vapcell S4+</title>
+  <style>
+    :root {
+      --bg: #0b0e14;
+      --card: #151922;
+      --card-alt: #1a202c;
+      --border: #242d3d;
+      --border-accent: #10b981;
+      --text: #f3f4f6;
+      --subtext: #9ca3af;
+      --green: #10b981;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --accent: #0ea5e9;
+      --accent-hover: #0284c7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      padding: 16px;
+      padding-bottom: 80px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-secondary {
+      background: #1e2638;
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: #2a354c;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 12px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--subtext);
+      margin-bottom: 6px;
+    }
+
+    input, select {
+      width: 100%;
+      background: #0d1117;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 11px 14px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    /* Стилізація селекта форм-фактора */
+    select#batType {
+      border: 1px solid var(--border-accent);
+      outline: none;
+      box-shadow: 0 0 6px rgba(16, 185, 129, 0.25);
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.25);
+    }
+
+    optgroup {
+      background: #151922;
+      color: #38bdf8;
+      font-weight: 700;
+    }
+
+    option {
+      background: #0d1117;
+      color: var(--text);
+      font-weight: 400;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 13px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      width: 100%;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .bms-calc {
+      background: #0c1a2e;
+      border: 1px solid #1e3a5f;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .bms-calc.active {
+      display: block;
+    }
+
+    .bms-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #38bdf8;
+      margin-bottom: 8px;
+    }
+
+    .bms-stats {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge-green { background: rgba(16, 185, 129, 0.15); color: var(--green); border: 1px solid var(--green); }
+    .badge-yellow { background: rgba(245, 158, 11, 0.15); color: var(--yellow); border: 1px solid var(--yellow); }
+    .badge-red { background: rgba(239, 68, 68, 0.15); color: var(--red); border: 1px solid var(--red); }
+
+    .search-bar {
+      width: 100%;
+      margin-bottom: 16px;
+      background: #0d1117;
+      border: 1px solid var(--border);
+    }
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .item-check {
+      transform: scale(1.3);
+      cursor: pointer;
+      accent-color: var(--accent);
+    }
+
+    .item-id {
+      font-size: 1.15rem;
+      font-weight: 800;
+      width: 46px;
+      color: #38bdf8;
+    }
+
+    .item-details {
+      flex: 1;
+    }
+
+    .item-main {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    .item-sub {
+      font-size: 0.75rem;
+      color: var(--subtext);
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      color: #64748b;
+      font-size: 1.25rem;
+      padding: 6px 10px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .delete-btn:hover {
+      color: var(--red);
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--subtext);
+      padding: 30px 10px;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🔋 Vapcell S4+ База</h1>
+    <div class="header-actions">
+      <button class="btn-secondary" onclick="exportData()">Експорт</button>
+      <button class="btn-secondary" onclick="document.getElementById('importFile').click()">Імпорт</button>
+      <input type="file" id="importFile" style="display:none" onchange="importData(event)">
+    </div>
+  </header>
+
+  <div class="card">
+    <form id="addForm" onsubmit="addBattery(event)">
+      <div class="form-grid">
+        <div class="form-group" style="margin-bottom:0;">
+          <label>ID на контакті</label>
+          <input type="text" id="batId" required placeholder="#01">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Форм-фактор</label>
+          <select id="batType">
+            <optgroup label="Li-ion (найпопулярніші)">
+              <option value="18650" selected>18650</option>
+              <option value="21700">21700 (в т.ч. із захистом)</option>
+              <option value="26650">26650 (слоти 1 і 4)</option>
+              <option value="20700">20700</option>
+              <option value="14500">14500 (формат АА 3.7V)</option>
+              <option value="16340">16340 / RCR123A</option>
+              <option value="18350">18350</option>
+              <option value="18500">18500</option>
+              <option value="10440">10440 (формат ААА 3.7V)</option>
+            </optgroup>
+            <optgroup label="Ni-MH / Ni-CD (1.2V)">
+              <option value="AA">AA (пальчикові)</option>
+              <option value="AAA">AAA (мікропальчикові)</option>
+              <option value="C">C / R14 (середні бочки)</option>
+              <option value="D">D / R20 (великі бочки, слоти 1 і 4)</option>
+              <option value="AAAA">AAAA</option>
+              <option value="SC">Sub-C</option>
+            </optgroup>
+            <optgroup label="Інші Li-ion">
+              <option value="17670">17670</option>
+              <option value="17500">17500</option>
+              <option value="10340">10340</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Ємність (Cap Test mAh)</label>
+          <input type="number" id="batCap" required placeholder="напр. 3120">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Опір (mR)</label>
+          <input type="number" id="batMr" required placeholder="напр. 28">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Примітка (призначення / де стоїть)</label>
+        <input type="text" id="batNote" placeholder="напр. Digad 1956, збірка 4S, резерв">
+      </div>
+
+      <button type="submit" class="btn-primary">+ Зберегти акумулятор</button>
+    </form>
+  </div>
+
+  <div id="bmsBox" class="bms-calc">
+    <div class="bms-title">⚖️ Калькулятор паралелі (BMS):</div>
+    <div class="bms-stats">
+      <span>Сумарна ємність: <strong id="bmsTotalCap" style="color:#fff;">0</strong> mAh</span>
+      <span>Різниця опору: <strong id="bmsDeltaMr" style="color:#fff;">0</strong> mR</span>
+    </div>
+    <div id="bmsStatus" style="font-size: 0.8rem; margin-top: 6px;"></div>
+  </div>
+
+  <input type="text" id="search" class="search-bar" placeholder="🔍 Пошук за ID, форматом або приміткою..." oninput="renderList()">
+
+  <div id="list" class="list"></div>
+
+  <script>
+    let db = JSON.parse(localStorage.getItem('vapcell_db') || '[]');
+
+    function save() {
+      localStorage.setItem('vapcell_db', JSON.stringify(db));
+      updateNextId();
+    }
+
+    function updateNextId() {
+      const input = document.getElementById('batId');
+      if (!input.value || input.value.startsWith('#')) {
+        const nextNum = db.length + 1;
+        input.value = '#' + (nextNum < 10 ? '0' + nextNum : nextNum);
+      }
+    }
+
+    function addBattery(e) {
+      e.preventDefault();
+      const item = {
+        id: document.getElementById('batId').value.trim(),
+        type: document.getElementById('batType').value,
+        cap: parseInt(document.getElementById('batCap').value),
+        mr: parseInt(document.getElementById('batMr').value),
+        note: document.getElementById('batNote').value.trim(),
+        date: new Date().toLocaleDateString('uk-UA')
+      };
+      db.unshift(item);
+      save();
+      document.getElementById('batCap').value = '';
+      document.getElementById('batMr').value = '';
+      document.getElementById('batNote').value = '';
+      renderList();
+    }
+
+    function deleteItem(index) {
+      if (confirm(`Видалити акумулятор ${db[index].id} із бази?`)) {
+        db.splice(index, 1);
+        save();
+        renderList();
+      }
+    }
+
+    function getBadge(mr, type) {
+      // Поріг для Ni-MH (AA/AAA) дещо інший ніж для Li-ion
+      const isNiMh = ['AA', 'AAA', 'C', 'D', 'AAAA', 'SC'].includes(type);
+      const greenThreshold = isNiMh ? 50 : 45;
+      const yellowThreshold = isNiMh ? 100 : 80;
+
+      if (mr < greenThreshold) return `<span class="badge badge-green">${mr} mR • Топ</span>`;
+      if (mr <= yellowThreshold) return `<span class="badge badge-yellow">${mr} mR • Норма</span>`;
+      return `<span class="badge badge-red">${mr} mR • Відбраковка</span>`;
+    }
+
+    function calculateBms() {
+      const selected = Array.from(document.querySelectorAll('.item-check:checked')).map(cb => db[cb.dataset.index]);
+      const box = document.getElementById('bmsBox');
+      if (selected.length < 2) {
+        box.classList.remove('active');
+        return;
+      }
+      box.classList.add('active');
+      const totalCap = selected.reduce((sum, el) => sum + el.cap, 0);
+      const mrs = selected.map(el => el.mr);
+      const delta = Math.max(...mrs) - Math.min(...mrs);
+
+      document.getElementById('bmsTotalCap').innerText = totalCap;
+      document.getElementById('bmsDeltaMr').innerText = delta;
+
+      const status = document.getElementById('bmsStatus');
+      if (delta <= 10) {
+        status.innerHTML = '<span style="color:var(--green); font-weight:600;">✓ Безпечно для однієї паралелі (Δ ≤ 10 mR)</span>';
+      } else {
+        status.innerHTML = '<span style="color:var(--red); font-weight:600;">⚠ Не з\'єднувати в одну паралель (Δ > 10 mR, елементи перегріватимуться)</span>';
+      }
+    }
+
+    function renderList() {
+      const q = document.getElementById('search').value.toLowerCase();
+      const listEl = document.getElementById('list');
+      listEl.innerHTML = '';
+
+      if (db.length === 0) {
+        listEl.innerHTML = '<div class="empty-state">База порожня. Додайте свій перший протестований акумулятор вище.</div>';
+        return;
+      }
+
+      db.forEach((item, index) => {
+        if (q && !item.id.toLowerCase().includes(q) && !item.note.toLowerCase().includes(q) && !item.type.toLowerCase().includes(q)) return;
+
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.innerHTML = `
+          <input type="checkbox" class="item-check" data-index="${index}" onchange="calculateBms()">
+          <div class="item-id">${item.id}</div>
+          <div class="item-details">
+            <div class="item-main">
+              <span>${item.cap} mAh</span>
+              ${getBadge(item.mr, item.type)}
+            </div>
+            <div class="item-sub">${item.type} | ${item.note || 'Без примітки'} | ${item.date}</div>
+          </div>
+          <button class="delete-btn" onclick="deleteItem(${index})" title="Видалити">✕</button>
+        `;
+        listEl.appendChild(div);
+      });
+      calculateBms();
+    }
+
+    function exportData() {
+      const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `vapcell_backup_${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+    }
+
+    function importData(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          db = JSON.parse(event.target.result);
+          save();
+          renderList();
+          alert('Базу успішно відновлено!');
+        } catch (err) {
+          alert('Помилка: невірний формат JSON-файлу!');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    updateNextId();
+    renderList();
+  </script>
+</body>
+</html>
