@@ -435,3 +435,34 @@ input:focus, select:focus {
   .badge, .brand-badge { border-color: #999; color: #000; background: #eee; }
   body::before { content: "Реєстр акумуляторів Vapcell S4+"; display: block; font-size: 16pt; font-weight: bold; margin-bottom: 12pt; }
 }
+
+/* Стилі для Акордеону (Розумний автопідбір) */
+.accordion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  margin-bottom: 0;
+  padding: 4px 0;
+  user-select: none;
+  transition: color 0.2s;
+}
+
+.accordion-header:hover {
+  color: #7dd3fc;
+}
+
+.accordion-icon {
+  font-size: 0.8rem;
+  transition: transform 0.3s ease;
+  color: #64748b;
+}
+
+#builderCard.accordion-open .accordion-icon {
+  transform: rotate(180deg);
+  color: #38bdf8;
+}
+
+#builderCard.accordion-open .accordion-header {
+  margin-bottom: 12px;
+}
