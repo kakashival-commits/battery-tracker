@@ -257,6 +257,12 @@ function updateLiveStatus() {
 
   const { green, yellow, black } = getThresholds(type, isProtected);
   const protNotice = isProtected ? ' (з платою захисту PCB)' : '';
+  
+  // Додаємо розумну підказку про габарити 21700
+  let extraNote = '';
+  if (type === '21700' && isProtected) {
+    extraNote = '<br><span style="color:#fcd34d; font-size:0.8rem; display:inline-block; margin-top:4px;">📏 <strong>Увага (Довжина 75-77 мм):</strong> Ідеально влізе у Vapcell S4+ v3.0, але НЕ поміститься в павербанки (напр. XTAR або звичайні корпуси на 4х21700).</span>';
+  }
 
   if (mrVal >= black) {
     box.className = 'live-status black';
@@ -264,13 +270,13 @@ function updateLiveStatus() {
     statusSelect.value = 'waste';
   } else if (mrVal > yellow) {
     box.className = 'live-status red';
-    box.innerHTML = `<strong>🔴 Високий опір / Знос (${mrVal} mR)${protNotice}:</strong> Відчутно гріється під навантаженням. Тільки для слабких ліхтариків або лампи в мінімальному режимі.`;
+    box.innerHTML = `<strong>🔴 Високий опір / Знос (${mrVal} mR)${protNotice}:</strong> Відчутно гріється під навантаженням. Тільки для слабких ліхтариків або лампи в мінімальному режимі.${extraNote}`;
   } else if (mrVal > green) {
     box.className = 'live-status yellow';
-    box.innerHTML = `<strong>🟡 Робочий стан (${mrVal} mR)${protNotice}:</strong> Для настільних ламп (Digad 1956), чергових ліхтарів та слабких навантажень до 1.5A.`;
+    box.innerHTML = `<strong>🟡 Робочий стан (${mrVal} mR)${protNotice}:</strong> Для настільних ламп (Digad 1956), чергових ліхтарів та слабких навантажень до 1.5A.${extraNote}`;
   } else {
     let loadNotice = isProtected 
-      ? 'Відмінно для ліхтарів і настільних світильників (не для швидких павербанків).'
+      ? `Відмінно для ліхтарів і настільних світильників (не для швидких павербанків).${extraNote}`
       : 'Ідеально для швидких павербанків (до 65–100W) та збірок з BMS.';
     box.className = 'live-status green';
     box.innerHTML = `<strong>🟢 Відмінний стан (${mrVal} mR)${protNotice}:</strong> ${loadNotice}`;
