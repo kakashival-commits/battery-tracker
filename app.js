@@ -21,7 +21,21 @@ function toggleModal(show) {
   else modal.classList.remove('active');
 }
 
-// Пороги опору: зелений, жовтий та чорний (критична небезпека)
+// Функція для керування Акордеоном (Автопідбір)
+function toggleBuilder() {
+  const content = document.getElementById('builderContent');
+  const card = document.getElementById('builderCard');
+  
+  if (content.style.display === 'none') {
+    content.style.display = 'block';
+    card.classList.add('accordion-open');
+  } else {
+    content.style.display = 'none';
+    card.classList.remove('accordion-open');
+  }
+}
+
+// Динамічні пороги опору для 4 рівнів
 function getThresholds(type, isProtected) {
   let green = 35;
   let yellow = 70;
@@ -197,10 +211,28 @@ function deleteItem(index) {
   }
 }
 
+// ОНОВЛЕНО: Контекстна логіка відображення вкладок
 function setTab(tab, el) {
   currentTab = tab;
   document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
   if (el) el.classList.add('active');
+
+  const builderCard = document.getElementById('builderCard');
+  if (builderCard) {
+    if (tab === 'free') {
+      builderCard.style.display = 'block'; // Показуємо тільки на "На полиці"
+    } else {
+      builderCard.style.display = 'none'; // Приховуємо на інших вкладках
+      
+      // Скидаємо стан акордеона при приховуванні
+      const builderContent = document.getElementById('builderContent');
+      if (builderContent) builderContent.style.display = 'none';
+      builderCard.classList.remove('accordion-open');
+      const builderResultBox = document.getElementById('builderResultBox');
+      if (builderResultBox) builderResultBox.classList.remove('active');
+    }
+  }
+
   renderList();
 }
 
@@ -434,6 +466,8 @@ function importData(e) {
   reader.readAsText(file);
 }
 
+// Ініціалізація
 updateNextId();
 updateTabCounters();
-renderList();
+// Викликаємо setTab для початкового налаштування видимості блоку автопідбору
+setTab('all', document.querySelector('.tab-btn.active'));
