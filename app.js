@@ -1,7 +1,13 @@
+// ==========================================
+// ЛОКАЛЬНІ ЗМІННІ ТА ХМАРНІ НАЛАШТУВАННЯ
+// ==========================================
 let db = JSON.parse(localStorage.getItem('vapcell_db') || '[]');
 let currentTab = 'all';
 let lastSelectedPack = [];
 let editingIndex = -1;
+
+let gistId = localStorage.getItem('vapcell_gist_id') || '';
+let githubToken = localStorage.getItem('vapcell_github_token') || '';
 
 const BRAND_LOGOS = {
   Samsung: `<span class="brand-badge brand-samsung"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-6h2v6zm4 0h-2V7h2v10z"/></svg>Samsung</span>`,
@@ -15,16 +21,116 @@ const BRAND_LOGOS = {
   Other: `<span class="brand-badge brand-other"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9"/></svg>Інший</span>`
 };
 
+// ==========================================
+// ХМАРНА СИНХРОНІЗАЦІЯ (GitHub Gist)
+// ==========================================
+
+function cloudSettings() {
+  const newGistId = prompt('Введіть ID вашого Gist (набір символів з посилання):', gistId);
+  if (newGistId === null) return;
+  
+  const newToken = prompt('Введіть GitHub Токен (починається на ghp_...):', githubToken);
+  if (newToken === null) return;
+
+  gistId = newGistId.trim();
+  githubToken = newToken.trim();
+  
+  localStorage.setItem('vapcell_gist_id', gistId);
+  localStorage.setItem('vapcell_github_token', githubToken);
+
+  if (githubToken && gistId) {
+    loadFromCloud();
+  } else {
+    updateCloudIcon(false);
+  }
+}
+
+function updateCloudIcon(active, syncing = false) {
+  const btn = document.getElementById('cloudBtn');
+  if (!btn) return;
+  if (syncing) {
+    btn.innerHTML = '⏳ Синхр...';
+    btn.style.color = '#f59e0b';
+  } else if (active) {
+    btn.innerHTML = '☁️ Хмара (Увімк)';
+    btn.style.color = '#34d399';
+  } else {
+    btn.innerHTML = '☁️ Хмара (Вимк)';
+    btn.style.color = '#94a3b8';
+  }
+}
+
+async function loadFromCloud() {
+  if (!gistId || !githubToken) {
+    updateCloudIcon(false);
+    return;
+  }
+  
+  updateCloudIcon(true, true);
+  try {
+    const res = await fetch(`https://api.github.com/gists/${gistId}`, {
+      headers: { 'Authorization': `token ${githubToken}` }
+    });
+    if (!res.ok) throw new Error('Помилка доступу до Gist');
+    
+    const data = await res.json();
+    const content = data.files['vapcell_db.json'].content;
+    
+    db = JSON.parse(content);
+    localStorage.setItem('vapcell_db', JSON.stringify(db));
+    
+    updateCloudIcon(true, false);
+    updateTabCounters();
+    renderList();
+  } catch (e) {
+    console.error(e);
+    alert('Помилка синхронізації! Перевірте Токен та ID.');
+    updateCloudIcon(false);
+  }
+}
+
+async function saveToCloud() {
+  if (!gistId || !githubToken) return;
+  
+  updateCloudIcon(true, true);
+  try {
+    const res = await fetch(`https://api.github.com/gists/${gistId}`, {
+      method: 'PATCH',
+      headers: { 
+        'Authorization': `token ${githubToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        files: {
+          'vapcell_db.json': {
+            content: JSON.stringify(db, null, 2)
+          }
+        }
+      })
+    });
+    if (!res.ok) throw new Error('Помилка збереження в Gist');
+    updateCloudIcon(true, false);
+  } catch (e) {
+    console.error(e);
+    alert('Не вдалося зберегти в хмару! Дані збережено лише локально.');
+    updateCloudIcon(false);
+  }
+}
+
+// ==========================================
+// ОСНОВНА ЛОГІКА ДОДАТКА
+// ==========================================
+
 function toggleModal(show) {
   const modal = document.getElementById('modalHint');
   if (show) modal.classList.add('active');
   else modal.classList.remove('active');
 }
 
-// Функція для керування Акордеоном (Автопідбір)
 function toggleBuilder() {
   const content = document.getElementById('builderContent');
   const card = document.getElementById('builderCard');
+  if (!content || !card) return;
   
   if (content.style.display === 'none') {
     content.style.display = 'block';
@@ -35,48 +141,28 @@ function toggleBuilder() {
   }
 }
 
-// Динамічні пороги опору для 4 рівнів
 function getThresholds(type, isProtected) {
-  let green = 35;
-  let yellow = 70;
-  let black = 160;
+  let green = 35, yellow = 70, black = 160;
 
   if (type === '21700' || type === '20700') {
-    green = 25;
-    yellow = 45;
-    black = 90;
+    green = 25; yellow = 45; black = 90;
   } else if (type === '26650') {
-    green = 30;
-    yellow = 50;
-    black = 120;
+    green = 30; yellow = 50; black = 120;
   } else if (type === '18650') {
-    green = 35;
-    yellow = 70;
-    black = 160;
+    green = 35; yellow = 70; black = 160;
   } else if (['18350', '18500', '14500', '16340'].includes(type)) {
-    green = 70;
-    yellow = 120;
-    black = 220;
+    green = 70; yellow = 120; black = 220;
   } else if (type === '10440') {
-    green = 90;
-    yellow = 150;
-    black = 250;
+    green = 90; yellow = 150; black = 250;
   } else if (['AA', 'C', 'D'].includes(type)) {
-    green = 40;
-    yellow = 80;
-    black = 180;
+    green = 40; yellow = 80; black = 180;
   } else if (['AAA'].includes(type)) {
-    green = 60;
-    yellow = 110;
-    black = 200;
+    green = 60; yellow = 110; black = 200;
   }
 
   if (isProtected) {
-    green += 25;
-    yellow += 25;
-    black += 40;
+    green += 25; yellow += 25; black += 40;
   }
-
   return { green, yellow, black };
 }
 
@@ -88,6 +174,7 @@ function save() {
   localStorage.setItem('vapcell_db', JSON.stringify(db));
   updateNextId();
   updateTabCounters();
+  saveToCloud(); // Зберігаємо локально і відправляємо у хмару
 }
 
 function updateNextId() {
@@ -211,7 +298,6 @@ function deleteItem(index) {
   }
 }
 
-// ОНОВЛЕНО: Контекстна логіка відображення вкладок
 function setTab(tab, el) {
   currentTab = tab;
   document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -220,11 +306,9 @@ function setTab(tab, el) {
   const builderCard = document.getElementById('builderCard');
   if (builderCard) {
     if (tab === 'free') {
-      builderCard.style.display = 'block'; // Показуємо тільки на "На полиці"
+      builderCard.style.display = 'block';
     } else {
-      builderCard.style.display = 'none'; // Приховуємо на інших вкладках
-      
-      // Скидаємо стан акордеона при приховуванні
+      builderCard.style.display = 'none';
       const builderContent = document.getElementById('builderContent');
       if (builderContent) builderContent.style.display = 'none';
       builderCard.classList.remove('accordion-open');
@@ -362,7 +446,7 @@ function applyPackInUse() {
       item.note = packName + (item.note ? ` | ${item.note}` : '');
     }
   });
-  save();
+  save(); // Після переведення статусу збережеться і локально, і в хмару
   renderList();
   document.getElementById('builderResultBox').classList.remove('active');
   alert(`Успішно переведено ${lastSelectedPack.length} акумуляторів у статус «У роботі»!`);
@@ -466,8 +550,16 @@ function importData(e) {
   reader.readAsText(file);
 }
 
-// Ініціалізація
+// ==========================================
+// ІНІЦІАЛІЗАЦІЯ ПРИ ЗАПУСКУ
+// ==========================================
 updateNextId();
 updateTabCounters();
-// Викликаємо setTab для початкового налаштування видимості блоку автопідбору
 setTab('all', document.querySelector('.tab-btn.active'));
+
+if (githubToken && gistId) {
+  loadFromCloud();
+} else {
+  renderList();
+  updateCloudIcon(false);
+}
