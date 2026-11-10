@@ -1,13 +1,18 @@
 // ==========================================
-// ЛОКАЛЬНІ ЗМІННІ ТА ХМАРНІ НАЛАШТУВАННЯ
+// 1. ЛОКАЛЬНІ ЗМІННІ ТА ХМАРНІ НАЛАШТУВАННЯ
 // ==========================================
 let db = JSON.parse(localStorage.getItem('vapcell_db') || '[]');
 let currentTab = 'all';
 let lastSelectedPack = [];
 let editingIndex = -1;
 
+// Змінні для хмарної синхронізації
 let gistId = localStorage.getItem('vapcell_gist_id') || '';
 let githubToken = localStorage.getItem('vapcell_github_token') || '';
+
+// Змінні для кастомних модалок
+let confirmCallback = null;
+let promptCallback = null;
 
 const BRAND_LOGOS = {
   Samsung: `<span class="brand-badge brand-samsung"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-6h2v6zm4 0h-2V7h2v10z"/></svg>Samsung</span>`,
@@ -21,22 +26,39 @@ const BRAND_LOGOS = {
   Other: `<span class="brand-badge brand-other"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9"/></svg>Інший</span>`
 };
 
+
 // ==========================================
-// ХМАРНА СИНХРОНІЗАЦІЯ (GitHub Gist)
+// 2. КАСТОМНІ МОДАЛЬНІ ВІКНА (UI)
 // ==========================================
 
+function toggleModal(show) {
+  const modal = document.getElementById('modalHint');
+  if (show) modal.classList.add('active');
+  else modal.classList.remove('active');
+}
+
+// Модалка: Хмарні налаштування
 function cloudSettings() {
-  const newGistId = prompt('Введіть ID вашого Gist (набір символів з посилання):', gistId);
-  if (newGistId === null) return;
-  
-  const newToken = prompt('Введіть GitHub Токен (починається на ghp_...):', githubToken);
-  if (newToken === null) return;
+  document.getElementById('inputGistId').value = gistId;
+  document.getElementById('inputGistToken').value = githubToken;
+  document.getElementById('modalCloud').classList.add('active');
+}
 
-  gistId = newGistId.trim();
-  githubToken = newToken.trim();
+function closeCloudModal() {
+  document.getElementById('modalCloud').classList.remove('active');
+}
+
+function saveCloudSettings() {
+  const newGistId = document.getElementById('inputGistId').value.trim();
+  const newToken = document.getElementById('inputGistToken').value.trim();
+
+  gistId = newGistId;
+  githubToken = newToken;
   
   localStorage.setItem('vapcell_gist_id', gistId);
   localStorage.setItem('vapcell_github_token', githubToken);
+
+  closeCloudModal();
 
   if (githubToken && gistId) {
     loadFromCloud();
@@ -44,6 +66,61 @@ function cloudSettings() {
     updateCloudIcon(false);
   }
 }
+
+// Модалка: Confirm (заміна системного confirm)
+function customConfirm(message, callback) {
+  document.getElementById('confirmMessage').innerText = message;
+  confirmCallback = callback;
+  document.getElementById('modalConfirm').classList.add('active');
+}
+
+function closeConfirmModal() {
+  document.getElementById('modalConfirm').classList.remove('active');
+  confirmCallback = null;
+}
+
+function executeConfirm() {
+  if (confirmCallback) confirmCallback();
+  closeConfirmModal();
+}
+
+// Модалка: Prompt (заміна системного prompt)
+function customPrompt(callback) {
+  document.getElementById('promptInput').value = 'Павербанк';
+  promptCallback = callback;
+  document.getElementById('modalPrompt').classList.add('active');
+}
+
+function closePromptModal() {
+  document.getElementById('modalPrompt').classList.remove('active');
+  promptCallback = null;
+}
+
+function executePrompt() {
+  const val = document.getElementById('promptInput').value.trim();
+  if (promptCallback && val) promptCallback(val);
+  closePromptModal();
+}
+
+// Акордеон: автопідбір
+function toggleBuilder() {
+  const content = document.getElementById('builderContent');
+  const card = document.getElementById('builderCard');
+  if (!content || !card) return;
+  
+  if (content.style.display === 'none') {
+    content.style.display = 'block';
+    card.classList.add('accordion-open');
+  } else {
+    content.style.display = 'none';
+    card.classList.remove('accordion-open');
+  }
+}
+
+
+// ==========================================
+// 3. ХМАРНА СИНХРОНІЗАЦІЯ (GitHub Gist)
+// ==========================================
 
 function updateCloudIcon(active, syncing = false) {
   const btn = document.getElementById('cloudBtn');
@@ -84,7 +161,6 @@ async function loadFromCloud() {
     renderList();
   } catch (e) {
     console.error(e);
-    alert('Помилка синхронізації! Перевірте Токен та ID.');
     updateCloudIcon(false);
   }
 }
@@ -112,34 +188,14 @@ async function saveToCloud() {
     updateCloudIcon(true, false);
   } catch (e) {
     console.error(e);
-    alert('Не вдалося зберегти в хмару! Дані збережено лише локально.');
     updateCloudIcon(false);
   }
 }
 
-// ==========================================
-// ОСНОВНА ЛОГІКА ДОДАТКА
-// ==========================================
 
-function toggleModal(show) {
-  const modal = document.getElementById('modalHint');
-  if (show) modal.classList.add('active');
-  else modal.classList.remove('active');
-}
-
-function toggleBuilder() {
-  const content = document.getElementById('builderContent');
-  const card = document.getElementById('builderCard');
-  if (!content || !card) return;
-  
-  if (content.style.display === 'none') {
-    content.style.display = 'block';
-    card.classList.add('accordion-open');
-  } else {
-    content.style.display = 'none';
-    card.classList.remove('accordion-open');
-  }
-}
+// ==========================================
+// 4. ОСНОВНА ЛОГІКА ДОДАТКА
+// ==========================================
 
 function getThresholds(type, isProtected) {
   let green = 35, yellow = 70, black = 160;
@@ -290,12 +346,12 @@ function cancelEdit() {
 }
 
 function deleteItem(index) {
-  if (confirm(`Видалити акумулятор ${db[index].id} із бази?`)) {
+  customConfirm(`Видалити акумулятор ${db[index].id} із бази?`, () => {
     if (editingIndex === index) cancelEdit();
     db.splice(index, 1);
     save();
     renderList();
-  }
+  });
 }
 
 function setTab(tab, el) {
@@ -436,20 +492,20 @@ function autoBuildPack() {
 
 function applyPackInUse() {
   if (!lastSelectedPack.length) return;
-  const packName = prompt('Введіть назву пристрою для цих акумуляторів:', 'Павербанк');
-  if (packName === null) return;
-
-  lastSelectedPack.forEach(sel => {
-    const item = db.find(x => x.id === sel.id);
-    if (item) {
-      item.status = 'in_use';
-      item.note = packName + (item.note ? ` | ${item.note}` : '');
-    }
+  
+  customPrompt((packName) => {
+    lastSelectedPack.forEach(sel => {
+      const item = db.find(x => x.id === sel.id);
+      if (item) {
+        item.status = 'in_use';
+        item.note = packName + (item.note ? ` | ${item.note}` : '');
+      }
+    });
+    save(); // Збережеться локально та в хмару
+    renderList();
+    const builderResultBox = document.getElementById('builderResultBox');
+    if(builderResultBox) builderResultBox.classList.remove('active');
   });
-  save(); // Після переведення статусу збережеться і локально, і в хмару
-  renderList();
-  document.getElementById('builderResultBox').classList.remove('active');
-  alert(`Успішно переведено ${lastSelectedPack.length} акумуляторів у статус «У роботі»!`);
 }
 
 function calculateBms() {
@@ -542,7 +598,6 @@ function importData(e) {
       db = JSON.parse(event.target.result);
       save();
       renderList();
-      alert('Базу успішно відновлено!');
     } catch (err) {
       alert('Помилка: невірний формат JSON-файлу!');
     }
@@ -551,7 +606,7 @@ function importData(e) {
 }
 
 // ==========================================
-// ІНІЦІАЛІЗАЦІЯ ПРИ ЗАПУСКУ
+// 5. ІНІЦІАЛІЗАЦІЯ ПРИ ЗАПУСКУ
 // ==========================================
 updateNextId();
 updateTabCounters();
