@@ -107,24 +107,29 @@
     </form>
   </div>
 
-  <!-- Розумний автопідбір для павербанка -->
-  <div class="card">
-    <div class="card-title">⚡ Розумний автопідбір для павербанка</div>
-    <div class="builder-controls">
-      <select id="buildType" style="width: auto; min-width: 130px;">
-        <option value="21700" selected>21700</option>
-        <option value="18650">18650</option>
-      </select>
-      <select id="buildCount" style="width: auto; min-width: 130px;">
-        <option value="2">На 2 шт.</option>
-        <option value="4" selected>На 4 шт. (стандарт)</option>
-        <option value="8">На 8 шт. (станція)</option>
-      </select>
-      <button class="btn-builder" onclick="autoBuildPack()">⚡ Підібрати комплект</button>
+  <!-- Розумний автопідбір для павербанка (Контекстний Акордеон) -->
+  <div class="card" id="builderCard" style="display: none;">
+    <div class="card-title accordion-header" onclick="toggleBuilder()">
+      <span>⚡ Розумний автопідбір (тільки з вільних)</span>
+      <span id="builderIcon" class="accordion-icon">▼</span>
     </div>
-
-    <div id="builderResultBox" class="builder-result"></div>
+    <div id="builderContent" style="display: none; margin-top: 14px;">
+      <div class="builder-controls">
+        <select id="buildType" style="width: auto; min-width: 130px;">
+          <option value="21700" selected>21700</option>
+          <option value="18650">18650</option>
+        </select>
+        <select id="buildCount" style="width: auto; min-width: 130px;">
+          <option value="2">На 2 шт.</option>
+          <option value="4" selected>На 4 шт. (стандарт)</option>
+          <option value="8">На 8 шт. (станція)</option>
+        </select>
+        <button class="btn-builder" onclick="autoBuildPack()">⚡ Підібрати комплект</button>
+      </div>
+      <div id="builderResultBox" class="builder-result"></div>
+    </div>
   </div>
+  
 
   <!-- Калькулятор ручного вибору BMS -->
   <div id="bmsBox" class="bms-calc">
