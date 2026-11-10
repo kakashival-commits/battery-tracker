@@ -1,0 +1,437 @@
+:root {
+  --bg: #0b0e14;
+  --card: #151922;
+  --border: #242d3d;
+  --border-accent: #10b981;
+  --text: #f3f4f6;
+  --subtext: #9ca3af;
+  --green: #10b981;
+  --yellow: #f59e0b;
+  --red: #ef4444;
+  --accent: #0ea5e9;
+  --accent-hover: #0284c7;
+  --purple: #8b5cf6;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  padding: 16px;
+  padding-bottom: 80px;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.btn-secondary {
+  background: #1e2638;
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 7px 11px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-secondary:hover { background: #2a354c; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #38bdf8;
+  margin-bottom: 12px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.2fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 560px) {
+  .form-grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--subtext);
+  margin-bottom: 5px;
+}
+
+.label-with-hint {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hint-btn {
+  background: none;
+  border: none;
+  color: #38bdf8;
+  font-size: 0.75rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.hint-btn:hover { color: #7dd3fc; }
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  cursor: pointer;
+  margin-top: 6px;
+  user-select: none;
+}
+
+.checkbox-label input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+input, select {
+  width: 100%;
+  background: #0d1117;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  transition: border-color 0.2s;
+}
+
+select#batType {
+  border: 1px solid var(--border-accent);
+  outline: none;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Статуси live-діагностики */
+.live-status {
+  display: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.live-status.green {
+  display: block;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid var(--green);
+  color: #34d399;
+}
+
+.live-status.yellow {
+  display: block;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid var(--yellow);
+  color: #fbbf24;
+}
+
+.live-status.red {
+  display: block;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid var(--red);
+  color: #f87171;
+}
+
+.live-status.black {
+  display: block;
+  background: #0a0a0c;
+  border: 1.5px solid #ef4444;
+  color: #fca5a5;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.25);
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  width: 100%;
+  cursor: pointer;
+}
+
+.btn-primary:hover { background: var(--accent-hover); }
+
+.btn-builder {
+  background: var(--purple);
+  color: #fff;
+  border: none;
+  padding: 11px 16px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.builder-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.builder-result {
+  background: #0d1424;
+  border: 1px solid #233554;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  display: none;
+}
+
+.builder-result.active { display: block; }
+
+.builder-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+  margin: 10px 0;
+  background: #151d30;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.builder-stat-val { font-size: 1.05rem; font-weight: 700; color: #38bdf8; }
+
+.tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.tab-btn {
+  background: #151922;
+  border: 1px solid var(--border);
+  color: var(--subtext);
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.tab-btn.active {
+  background: #1e293b;
+  border-color: var(--accent);
+  color: #38bdf8;
+}
+
+.bms-calc {
+  background: #0c1a2e;
+  border: 1px solid #1e3a5f;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 16px;
+  display: none;
+}
+
+.bms-calc.active { display: block; }
+.bms-title { font-size: 0.85rem; font-weight: 700; color: #38bdf8; margin-bottom: 8px; }
+.bms-stats { display: flex; justify-content: space-between; font-size: 0.95rem; }
+
+/* Бейджі станів */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.badge-green { background: rgba(16, 185, 129, 0.15); color: var(--green); border: 1px solid var(--green); }
+.badge-yellow { background: rgba(245, 158, 11, 0.15); color: var(--yellow); border: 1px solid var(--yellow); }
+.badge-red { background: rgba(239, 68, 68, 0.15); color: var(--red); border: 1px solid var(--red); }
+.badge-black {
+  background: #050505;
+  color: #ff4d4d;
+  border: 1.5px solid #b91c1c;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.35);
+  font-weight: 800;
+}
+.badge-status { background: #1e2638; color: #cbd5e1; border: 1px solid #334155; }
+.badge-protected {
+  background: rgba(139, 92, 246, 0.2);
+  border: 1px solid #8b5cf6;
+  color: #c4b5fd;
+}
+
+/* Бейджі брендів з SVG */
+.brand-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.brand-badge svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.brand-samsung { background: rgba(14, 116, 144, 0.2); border-color: #0284c7; color: #38bdf8; }
+.brand-lg { background: rgba(225, 29, 72, 0.2); border-color: #f43f5e; color: #fb7185; }
+.brand-panasonic { background: rgba(30, 58, 138, 0.25); border-color: #3b82f6; color: #93c5fd; }
+.brand-sony { background: rgba(71, 85, 105, 0.25); border-color: #94a3b8; color: #e2e8f0; }
+.brand-vapcell { background: rgba(245, 158, 11, 0.2); border-color: #f59e0b; color: #fde047; }
+.brand-molicel { background: rgba(220, 38, 38, 0.2); border-color: #ef4444; color: #fca5a5; }
+.brand-eve { background: rgba(16, 185, 129, 0.2); border-color: #10b981; color: #6ee7b7; }
+.brand-bak { background: rgba(139, 92, 246, 0.2); border-color: #8b5cf6; color: #c4b5fd; }
+.brand-other { background: #1f2937; border-color: #374151; color: #9ca3af; }
+
+.search-bar { width: 100%; margin-bottom: 12px; background: #0d1117; }
+.list { display: flex; flex-direction: column; gap: 10px; }
+
+.item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.item-check { transform: scale(1.3); cursor: pointer; accent-color: var(--accent); }
+.item-id { font-size: 1.15rem; font-weight: 800; width: 44px; color: #38bdf8; }
+.item-details { flex: 1; }
+.item-main { display: flex; align-items: center; gap: 8px; font-size: 0.98rem; font-weight: 700; margin-bottom: 4px; flex-wrap: wrap; }
+.item-sub { font-size: 0.76rem; color: var(--subtext); line-height: 1.4; }
+
+.item-actions { display: flex; align-items: center; gap: 4px; }
+.btn-icon { background: none; border: none; color: #64748b; font-size: 1.15rem; padding: 6px; cursor: pointer; }
+.btn-icon:hover { color: var(--text); }
+.empty-state { text-align: center; color: var(--subtext); padding: 30px 10px; font-size: 0.9rem; }
+
+/* Модальне вікно */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-overlay.active { display: flex; }
+
+.modal-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  max-width: 540px;
+  width: 100%;
+  padding: 20px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-card table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  margin: 12px 0;
+}
+
+.modal-card th, .modal-card td {
+  border: 1px solid var(--border);
+  padding: 7px 9px;
+  text-align: left;
+}
+
+.modal-card th {
+  background: #0d1117;
+  color: #38bdf8;
+}
+
+/* Друк */
+@media print {
+  body { background: #fff; color: #000; padding: 0; }
+  header, .card, #bmsBox, .tabs, .search-bar, .item-check, .item-actions, .modal-overlay { display: none !important; }
+  #list { display: block; }
+  .item { background: #fff; border: 1px solid #ccc; color: #000; margin-bottom: 6px; page-break-inside: avoid; }
+  .item-id { color: #000; }
+  .item-sub { color: #555; }
+  .badge, .brand-badge { border-color: #999; color: #000; background: #eee; }
+  body::before { content: "Реєстр акумуляторів Vapcell S4+"; display: block; font-size: 16pt; font-weight: bold; margin-bottom: 12pt; }
+}
