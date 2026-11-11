@@ -230,7 +230,7 @@ function save() {
   localStorage.setItem('vapcell_db', JSON.stringify(db));
   updateNextId();
   updateTabCounters();
-  saveToCloud(); // Зберігаємо локально і відправляємо у хмару
+  saveToCloud();
 }
 
 function updateNextId() {
@@ -261,7 +261,7 @@ function updateLiveStatus() {
   // Додаємо розумну підказку про габарити 21700
   let extraNote = '';
   if (type === '21700' && isProtected) {
-    extraNote = '<br><span style="color:#fcd34d; font-size:0.8rem; display:inline-block; margin-top:4px;">📏 <strong>Увага (Довжина 75-77 мм):</strong> Ідеально влізе у Vapcell S4+ v3.0, але НЕ поміститься в павербанки (напр. XTAR або звичайні корпуси на 4х21700).</span>';
+    extraNote = '<br><span style="color:#fcd34d; font-size:0.8rem; display:inline-block; margin-top:4px;">📏 <strong>Увага (Довжина 75-77 мм):</strong> Ідеально влізе у Vapcell S4+ v3.0, але НЕ поміститься в павербанки.</span>';
   }
 
   if (mrVal >= black) {
@@ -293,6 +293,7 @@ function handleFormSubmit(e) {
     cap: parseInt(document.getElementById('batCap').value),
     mr: parseInt(document.getElementById('batMr').value),
     isProtected: document.getElementById('batProtected').checked,
+    isStorage: document.getElementById('batStorage') ? document.getElementById('batStorage').checked : false, // Підтримка Storage
     status: document.getElementById('batStatus').value,
     note: document.getElementById('batNote').value.trim(),
     date: editingIndex >= 0 ? db[editingIndex].date : new Date().toLocaleDateString('uk-UA')
@@ -306,6 +307,7 @@ function handleFormSubmit(e) {
     document.getElementById('batCap').value = '';
     document.getElementById('batMr').value = '';
     document.getElementById('batProtected').checked = false;
+    if (document.getElementById('batStorage')) document.getElementById('batStorage').checked = false;
     document.getElementById('batNote').value = '';
     updateLiveStatus();
   }
@@ -324,6 +326,7 @@ function startEdit(index) {
   document.getElementById('batCap').value = item.cap;
   document.getElementById('batMr').value = item.mr;
   document.getElementById('batProtected').checked = !!item.isProtected;
+  if (document.getElementById('batStorage')) document.getElementById('batStorage').checked = !!item.isStorage;
   document.getElementById('batStatus').value = item.status || 'free';
   document.getElementById('batNote').value = item.note || '';
 
@@ -345,6 +348,7 @@ function cancelEdit() {
   document.getElementById('batCap').value = '';
   document.getElementById('batMr').value = '';
   document.getElementById('batProtected').checked = false;
+  if (document.getElementById('batStorage')) document.getElementById('batStorage').checked = false;
   document.getElementById('batNote').value = '';
 
   updateNextId();
@@ -505,9 +509,10 @@ function applyPackInUse() {
       if (item) {
         item.status = 'in_use';
         item.note = packName + (item.note ? ` | ${item.note}` : '');
+        item.isStorage = false; // Знімаємо галочку Storage при переведенні в роботу
       }
     });
-    save(); // Збережеться локально та в хмару
+    save();
     renderList();
     const builderResultBox = document.getElementById('builderResultBox');
     if(builderResultBox) builderResultBox.classList.remove('active');
@@ -572,6 +577,7 @@ function renderList() {
           <span>${item.cap} mAh</span>
           ${getBadge(item.mr, item.type, item.isProtected)}
           ${item.isProtected ? '<span class="badge badge-protected">🛡️ Protected</span>' : ''}
+          ${item.isStorage ? '<span class="badge badge-storage">💤 3.7V</span>' : ''}
           ${getBrandBadge(item.brand)}
           ${getStatusBadge(item.status || 'free')}
         </div>
