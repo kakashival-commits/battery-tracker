@@ -94,6 +94,14 @@
         </div>
         
         <div class="form-group">
+          <div class="label-with-hint">
+            <label>Опір (mR)</label>
+            <button type="button" class="hint-btn" onclick="toggleModal(true)">ℹ️ Норми mR</button>
+          </div>
+          <input type="number" id="batMr" required placeholder="напр. 24" oninput="updateLiveStatus()">
+        </div>
+
+        <div class="form-group">
           <label>Статус</label>
           <select id="batStatus">
             <option value="free">📦 Вільний (на полиці)</option>
@@ -101,6 +109,21 @@
             <option value="waste">🛑 Відбраковка</option>
           </select>
         </div>
+      </div> <!-- Закриття сітки форми (вашого grid/flex) -->
+
+      <!-- НОВИЙ БЛОК: Тумблери винесені в окремий горизонтальний рядок -->
+      <div class="toggles-row">
+        <label class="toggle-label">
+          <input type="checkbox" id="batProtected" class="toggle-input" onchange="updateLiveStatus()">
+          <span class="toggle-slider"></span>
+          <span class="toggle-text">🛡️ Із захистом (PCB / Button Top)</span>
+        </label>
+
+        <label class="toggle-label" style="color:#d8b4fe;">
+          <input type="checkbox" id="batStorage" class="toggle-input">
+          <span class="toggle-slider storage-slider"></span>
+          <span class="toggle-text">💤 Режим Storage (3.7V)</span>
+        </label>
       </div>
 
       <div id="liveStatusBox" class="live-status"></div>
@@ -110,12 +133,11 @@
         <input type="text" id="batNote" placeholder="напр. 35E, лампа Digad 1956, резерв">
       </div>
 
-      <div style="display: flex; gap: 8px;">
+      <!-- Обертаємо кнопки в спеціальний клас для вирівнювання -->
+      <div class="form-actions-row">
         <button type="submit" id="submitBtn" class="btn-primary">+ Зберегти акумулятор</button>
         <button type="button" id="cancelEditBtn" class="btn-secondary" style="display: none; width: auto;" onclick="cancelEdit()">Скасувати</button>
       </div>
-    </form>
-  </div>
 
   <!-- Розумний автопідбір для павербанка (Контекстний Акордеон) -->
   <div class="card" id="builderCard" style="display: none;">
