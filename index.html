@@ -75,23 +75,6 @@
           <label>Ємність (Cap Test mAh)</label>
           <input type="number" id="batCap" required placeholder="напр. 3120">
         </div>
-        <div class="form-group">
-          <div class="label-with-hint">
-            <label>Опір (mR)</label>
-            <button type="button" class="hint-btn" onclick="toggleModal(true)">ℹ️ Норми mR</button>
-          </div>
-          <input type="number" id="batMr" required placeholder="напр. 24" oninput="updateLiveStatus()">
-          
-          <label class="checkbox-label" style="margin-bottom: 8px;">
-            <input type="checkbox" id="batProtected" onchange="updateLiveStatus()">
-            🛡️ Із захистом (PCB / Button Top)
-          </label>
-          
-          <label class="checkbox-label" style="color:#d8b4fe;">
-            <input type="checkbox" id="batStorage">
-            💤 Режим Storage (3.7V)
-          </label>
-        </div>
         
         <div class="form-group">
           <div class="label-with-hint">
@@ -111,7 +94,7 @@
         </div>
       </div> <!-- Закриття сітки форми (вашого grid/flex) -->
 
-      <!-- НОВИЙ БЛОК: Тумблери винесені в окремий горизонтальний рядок -->
+      <!-- Тумблери винесені в окремий горизонтальний рядок -->
       <div class="toggles-row">
         <label class="toggle-label">
           <input type="checkbox" id="batProtected" class="toggle-input" onchange="updateLiveStatus()">
@@ -133,11 +116,13 @@
         <input type="text" id="batNote" placeholder="напр. 35E, лампа Digad 1956, резерв">
       </div>
 
-      <!-- Обертаємо кнопки в спеціальний клас для вирівнювання -->
+      <!-- Кнопки збереження -->
       <div class="form-actions-row">
         <button type="submit" id="submitBtn" class="btn-primary">+ Зберегти акумулятор</button>
         <button type="button" id="cancelEditBtn" class="btn-secondary" style="display: none; width: auto;" onclick="cancelEdit()">Скасувати</button>
       </div>
+    </form>
+  </div>
 
   <!-- Розумний автопідбір для павербанка (Контекстний Акордеон) -->
   <div class="card" id="builderCard" style="display: none;">
