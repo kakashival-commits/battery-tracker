@@ -472,3 +472,88 @@ input:focus, select:focus {
   color: #d8b4fe;
   border: 1px solid rgba(168, 85, 247, 0.3);
 }
+
+/* ========================================= */
+/* СУЧАСНІ ТУМБЛЕРИ ТА ВИРІВНЮВАННЯ ФОРМИ      */
+/* ========================================= */
+
+/* Рядок для тумблерів */
+.toggles-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 16px;
+  padding: 4px 0;
+}
+
+/* Дизайн перемикача (iOS style) */
+.toggle-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 0.85rem;
+  user-select: none;
+}
+.toggle-input {
+  display: none; /* Ховаємо стандартний системний квадрат */
+}
+.toggle-slider {
+  position: relative;
+  width: 38px;
+  height: 22px;
+  background-color: #334155; /* Колір вимкненого фону */
+  border-radius: 22px;
+  margin-right: 10px;
+  transition: background-color 0.3s ease;
+  flex-shrink: 0;
+}
+.toggle-slider::before {
+  content: "";
+  position: absolute;
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  left: 3px;
+  bottom: 3px;
+  background-color: #fff;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Стан УВІМКНЕНО */
+.toggle-input:checked + .toggle-slider {
+  background-color: #0284c7; /* Синій для захисту */
+}
+.toggle-input:checked + .storage-slider {
+  background-color: #9333ea; /* Фіолетовий для Storage */
+}
+.toggle-input:checked + .toggle-slider::before {
+  transform: translateX(16px); /* Рух повзунка вправо */
+}
+
+/* ========================================= */
+/* АДАПТИВНІСТЬ КНОПКИ ЗБЕРЕЖЕННЯ            */
+/* ========================================= */
+
+/* За замовчуванням (для смартфонів) кнопка і контейнер на всю ширину */
+.form-actions-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+#submitBtn {
+  width: 100%;
+}
+
+/* На екранах від 600px (ПК/Планшет) кнопка стає акуратною справа */
+@media (min-width: 600px) {
+  .form-actions-row {
+    flex-direction: row;
+    justify-content: flex-end; /* Кнопки притискаються вправо */
+  }
+  #submitBtn {
+    width: auto;
+    min-width: 250px;
+  }
+}
